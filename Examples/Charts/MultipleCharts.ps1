@@ -1,6 +1,6 @@
 try {. $PSScriptRoot\..\..\LoadPSD1.ps1} catch {}
 
-Remove-Item -Path Tools.xlsx
+Remove-Item -Path Tools.xlsx -ErrorAction SilentlyContinue
 
 $data = @"
 ID,Product,Quantity,Price,Total
@@ -16,4 +16,4 @@ $c2 = New-ExcelChartDefinition -YRange "Total   "-XRange "Product" -Title "Total
 $c3 = New-ExcelChartDefinition -YRange "Quantity"-XRange "Product" -Title "Sales volume" -NoLegend -Height 225 -Row 15
 
 $data | ConvertFrom-Csv |
-    Export-Excel -Path  "Tools.xlsx" -AutoFilter -AutoNameRange -AutoSize -ExcelChartDefinition $c1,$c2,$c3  -Show
+    Export-Excel -Path  "Tools.xlsx" -AutoFilter -AutoNameRange -AutoSize -ExcelChartDefinition $c1, $c2, $c3  -Show
