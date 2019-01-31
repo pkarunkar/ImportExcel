@@ -285,6 +285,7 @@ function Import-Excel {
         [Int]$EndColumn  ,
         [Switch]$DataOnly,
         [ValidateNotNullOrEmpty()]
+        [Switch]$IgnoreEmptyRows,
         [String]$Password
     )
     Begin {
@@ -355,7 +356,7 @@ function Import-Excel {
         }
         #endregion
         Try {
-            #region Select worksheet
+		    #region Select worksheet
             if ($WorksheetName) {
                 if (-not ($Worksheet = $Excel.Workbook.Worksheets[$WorkSheetName])) {
                     throw "Worksheet '$WorksheetName' not found, the workbook only contains the worksheets '$($Excel.Workbook.Worksheets)'. If you only wish to select the first worksheet, please remove the '-WorksheetName' parameter."
@@ -416,11 +417,18 @@ function Import-Excel {
                         $NewRow[$P.Value] = $Worksheet.Cells[$R, $P.Column].Value
                         #    Write-Verbose "Import cell '$($Worksheet.Cells[$R, $P.Column].Address)' with property name '$($p.Value)' and value '$($Worksheet.Cells[$R, $P.Column].Value)'."
                     }
-
-                    [PSCustomObject]$NewRow
-                }
-                #endregion
+				#Region Ignore empty rows from hash
+				if($IgnoreEmptyRows){[PSCustomObject]$NewRow | Where-Object { $_.PSObject.Properties.Value -ne ''}}
+				else{[PSCustomObject]$NewRow}
+				#endregion				
             }
+								
+            }
+                #endregion
+				
+			
+            
+            
             Write-Debug $sw.Elapsed.TotalMilliseconds
         }
         Catch {
